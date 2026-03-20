@@ -1,0 +1,23 @@
+# Arduino build artifacts
+*.ino.eep
+*.ino.hex
+*.ino.with_bootloader.hex
+*.ino.bin
+*.elf
+*.map
+
+# Arduino IDE temporary files
+*.tmp
+*.bak
+
+# Proteus generated artifacts
+*.pdsbak
+*.dbk
+*.ldb
+*.TMP
+*.PDSPRJ.USER
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log

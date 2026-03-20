@@ -1,0 +1,24 @@
+flowchart TD
+    A[STATE_IDLE] --> B{Battery/Load Voltage >= Detect Threshold?}
+    B -- No --> A
+    B -- Yes --> C[STATE_PRECHARGE]
+
+    C --> D[Regulate Current to Precharge Setpoint]
+    D --> E{Voltage >= Precharge-to-CC Threshold?}
+    E -- No --> D
+    E -- Yes --> F[STATE_CC]
+
+    F --> G[Regulate Current to CC Setpoint]
+    G --> H{Voltage >= CC-to-CV Threshold?}
+    H -- No --> G
+    H -- Yes --> I[STATE_CV]
+
+    I --> J[Regulate Voltage to CV Target]
+    J --> K{Current <= Termination Current for Hold Time?}
+    K -- No --> J
+    K -- Yes --> L[STATE_COMPLETE]
+
+    L --> M[Disable Output / Maintain Monitoring]
+    M --> N{Voltage <= Recharge Threshold?}
+    N -- No --> M
+    N -- Yes --> F

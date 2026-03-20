@@ -1,0 +1,21 @@
+flowchart TD
+    A[Sample Sensors] --> B{Temperature > Max?}
+    B -- Yes --> C[Trip OVERTEMP Fault]
+    B -- No --> D{Voltage > Max Absolute?}
+    D -- Yes --> E[Trip OVERVOLT Fault]
+    D -- No --> F{Current > Max Absolute?}
+    F -- Yes --> G[Trip OVERCURRENT Fault]
+    F -- No --> H{Charge Time > Timeout?}
+    H -- Yes --> I[Trip TIMEOUT Fault]
+    H -- No --> J[No Trip: Continue Charging]
+
+    C --> K[Disable PWM and Power Stage]
+    E --> K
+    G --> K
+    I --> K
+
+    K --> L{Fault Type}
+    L -- OVERTEMP --> M{Temperature <= Resume Threshold?}
+    M -- Yes --> N[Auto Recover to IDLE]
+    M -- No --> K
+    L -- Other Faults --> O[Hold FAULT Until Manual Reset]

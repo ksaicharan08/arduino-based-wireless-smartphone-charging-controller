@@ -1,0 +1,20 @@
+flowchart TD
+    A[Power On] --> B[Initialize MCU Pins and Serial]
+    B --> C[Acquire Sensors: Voltage, Current, Temperature]
+    C --> D{Sensor Data Valid?}
+    D -- No --> E[Enter FAULT: Sensor Invalid]
+    D -- Yes --> F{Protection Threshold Exceeded?}
+    F -- Yes --> G[Shutdown Output and Latch Fault]
+    F -- No --> H[Run Charging State Machine]
+    H --> I[Update PWM / Enable Power Stage]
+    I --> J[Publish Telemetry to Serial Monitor]
+    J --> K[Update LEDs and User Status]
+    K --> C
+
+    G --> L{Fault Recoverable?}
+    L -- Yes --> M[Wait for Safe Conditions]
+    M --> C
+    L -- No --> N[Manual Reset Required]
+    N --> A
+
+    E --> L

@@ -1,0 +1,31 @@
+flowchart LR
+    subgraph PowerStage[Wireless Power Stage]
+        TX[Wireless TX Coil + Driver]
+        RX[Wireless RX Coil + Rectifier]
+        SW[MOSFET/Relay Switch]
+    end
+
+    subgraph Control[Arduino Controller]
+        MCU[Arduino Uno/Nano]
+        CTRL[PWM + Enable Control]
+        MON[Telemetry / Serial Monitor]
+    end
+
+    subgraph Sensors[Feedback Sensors]
+        VS[Voltage Sensor Module]
+        CS[Current Sensor Module]
+        TS[Temperature Sensor LM35/DS18B20]
+    end
+
+    LOAD[Smartphone Equivalent Load]
+
+    MCU --> CTRL
+    CTRL --> SW
+    SW --> TX
+    TX -. magnetic coupling .-> RX
+    RX --> LOAD
+
+    VS --> MCU
+    CS --> MCU
+    TS --> MCU
+    MCU --> MON
