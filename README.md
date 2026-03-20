@@ -42,6 +42,8 @@ Wireless smartphone charging systems must balance efficiency, thermal behavior, 
 |   `-- README.md
 `-- src/
     `-- wireless_charging_controller/
+    |-- control_core.c
+    |-- control_core.h
         `-- wireless_charging_controller.ino
 ```
 
@@ -195,14 +197,15 @@ flowchart TD
 ## 7. Setup and Build Instructions
 1. Install Arduino IDE (latest stable).
 2. Open `src/wireless_charging_controller/wireless_charging_controller.ino`.
-3. Select board and COM port.
-4. Adjust calibration constants in firmware to match your sensors:
+3. Ensure `src/wireless_charging_controller/control_core.c` and `src/wireless_charging_controller/control_core.h` remain in the same sketch folder (Arduino build includes them automatically).
+4. Select board and COM port.
+5. Adjust calibration constants in firmware to match your sensors:
    - `voltageDividerFactor`
    - `currentZeroVoltage`
    - `currentSensitivity`
-5. Upload to Arduino.
-6. Open Serial Monitor at `115200` baud.
-7. Observe telemetry while varying simulation/hardware conditions.
+6. Upload to Arduino.
+7. Open Serial Monitor at `115200` baud.
+8. Observe telemetry while varying simulation/hardware conditions.
 
 ## 8. Proteus Simulation
 Full step-by-step procedure is provided in:

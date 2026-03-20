@@ -12,6 +12,8 @@
   - Final smartphone products must comply with Qi protocol, EMC, and safety standards.
 */
 
+#include "control_core.h"
+
 // ------------------------------ Pin Mapping ------------------------------
 const uint8_t PIN_TEMP_LM35 = A0;      // LM35 analog output
 const uint8_t PIN_VOLT_SENSE = A1;     // Resistive divider output
@@ -94,10 +96,6 @@ uint32_t chargeStartMs = 0;
 uint32_t terminateStartMs = 0;
 
 // ------------------------------ Utility Functions ------------------------------
-float lowPass(float previous, float input, float alpha) {
-  return previous + alpha * (input - previous);
-}
-
 const char* stateToString(ChargerState s) {
   switch (s) {
     case STATE_IDLE: return "IDLE";
@@ -179,9 +177,9 @@ void updateSensors() {
   float voltNow = readVoltageV();
   float currNow = readCurrentA();
 
-  filtTempC = lowPass(filtTempC, tempNow, 0.2f);
-  filtVoltageV = lowPass(filtVoltageV, voltNow, 0.2f);
-  filtCurrentA = lowPass(filtCurrentA, currNow, 0.2f);
+  filtTempC = cc_low_pass(filtTempC, tempNow, 0.2f);
+  filtVoltageV = cc_low_pass(filtVoltageV, voltNow, 0.2f);
+  filtCurrentA = cc_low_pass(filtCurrentA, currNow, 0.2f);
 
   if (!sensorsAreValid(filtTempC, filtVoltageV, filtCurrentA)) {
     enterFault(FAULT_SENSOR_INVALID);
@@ -193,11 +191,7 @@ void regulateCurrent(float targetCurrentA) {
   // Simple incremental controller for robust 8-bit MCU operation.
   float err = targetCurrentA - filtCurrentA;
 
-  if (err > 0.08f && pwmDuty < 250) {
-    pwmDuty += 2;
-  } else if (err < -0.08f && pwmDuty > 2) {
-    pwmDuty -= 2;
-  }
+  pwmDuty = cc_adjust_pwm_step(pwmDuty, err, 0.08f, -0.08f, 2, 2, 0, 250);
 
   setPowerStage(true);
   setPwmDuty(pwmDuty);
@@ -206,11 +200,7 @@ void regulateCurrent(float targetCurrentA) {
 void regulateVoltage(float targetVoltageV) {
   float err = targetVoltageV - filtVoltageV;
 
-  if (err > 0.02f && pwmDuty < 250) {
-    pwmDuty += 1;
-  } else if (err < -0.02f && pwmDuty > 1) {
-    pwmDuty -= 1;
-  }
+  pwmDuty = cc_adjust_pwm_step(pwmDuty, err, 0.02f, -0.02f, 1, 1, 0, 250);
 
   setPowerStage(true);
   setPwmDuty(pwmDuty);
